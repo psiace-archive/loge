@@ -1,12 +1,21 @@
 [package]
 name = "loge"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Chojan Shang <psiace@outlook.com>"]
 edition = "2018"
+description = "A analysis friendly logger with formatted output."
 categories = ["development-tools::debugging"]
 keywords = ["log", "logger", "logging"]
+license = "MIT or Apache-2.0"
+repository = "https://github.com/psiace/loge"
+readme = "README.md"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+include = [
+  "Cargo.toml",
+  "LICENSE-APACHE",
+  "LICENSE-MIT",
+  "src/**/*"
+]
 
 [dependencies]
 chrono = "0.4.10"
