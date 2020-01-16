@@ -36,7 +36,7 @@ pub fn formatted_builder() -> Builder {
     builder.format(|formatter, record| {
         writeln!(
             formatter,
-            "{} [{}] ({}:{}): {}",
+            "{} [{:<5}] ({}:{}): {}",
             Local::now().format("%Y-%m-%d %H:%M:%S"),
             formatter.default_styled_level(record.level()),
             record.target(),
