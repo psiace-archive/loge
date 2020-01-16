@@ -19,15 +19,18 @@ loge = "0.1.1"
 After that, set the `RUST_LOG` variable in your code and initialize the logger.
 
 ```rust
-env::set_var("RUST_LOG", "info");
+env::set_var("RUST_LOG", "trace");
 loge::init();
 ```
 
 Just run your project, the log info will output as `date time [level] (target): infomation`:
 
 ```log
-2020-01-15 14:03:51 [INFO] (actix_server::builder:263): Starting 8 workers
-2020-01-15 14:03:51 [INFO] (actix_server::builder:275): Starting "actix-web-service-127.0.0.1:8087" service on 127.0.0.1:8087
+2020-01-16 18:57:46 [TRACE] (loge::tests:67): one level deep!
+2020-01-16 18:57:46 [DEBUG] (loge::tests:61): deboogging
+2020-01-16 18:57:46 [INFO ] (loge::tests:62): such information
+2020-01-16 18:57:46 [WARN ] (loge::tests:63): o_O
+2020-01-16 18:57:46 [ERROR] (loge::tests:64): boom
 ```
 
 ## Contact
