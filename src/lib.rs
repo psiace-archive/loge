@@ -29,7 +29,10 @@ pub extern crate env_logger;
 extern crate log;
 
 use chrono::Local;
-use env_logger::{fmt::{Color, Style, StyledValue}, Builder};
+use env_logger::{
+    fmt::{Color, Style, StyledValue},
+    Builder,
+};
 use log::Level;
 
 fn colored_level<'a>(style: &'a mut Style, level: Level) -> StyledValue<'a, &'static str> {
