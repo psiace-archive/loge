@@ -2,9 +2,7 @@
 
 > Imitation is the fastest way to learn.
 
-A fork of [pretty-env-logger](https://github.com/seanmonstar/pretty-env-logger) with Formatted output, analysis friendly.
-
-Almost a copy, including code.
+A fork of [pretty-env-logger](https://github.com/seanmonstar/pretty-env-logger) with formatted output for easy analysis.
 
 _**Note**_: Use improved log format from `0.2.0`.
 
