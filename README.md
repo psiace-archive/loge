@@ -2,9 +2,11 @@
 
 > Imitation is the fastest way to learn.
 
-Just a fork of [pretty-env-logger](https://github.com/seanmonstar/pretty-env-logger). Formatted output, analysis friendly.
+A fork of [pretty-env-logger](https://github.com/seanmonstar/pretty-env-logger) with Formatted output, analysis friendly.
 
 Almost a copy, including code.
+
+_**Note**_: Use improved log format from `0.2.0`.
 
 ## Usage
 
@@ -13,7 +15,7 @@ At first, you should add it to your `Cargo.toml` file.
 ```toml
 [dependencies]
 log = "0.4.8"
-loge = "0.1.2"
+loge = "0.2.0"
 ```
 
 After that, set the `RUST_LOG` variable in your code and initialize the logger.
@@ -23,14 +25,14 @@ env::set_var("RUST_LOG", "trace");
 loge::init();
 ```
 
-Just run your project, the log info will output as `date time [level] (target): infomation`:
+Just run your project, the log info will output as `date time [level] target - (line) ... message`:
 
 ```log
-2020-01-16 18:57:46 [TRACE] (loge::tests:67): one level deep!
-2020-01-16 18:57:46 [DEBUG] (loge::tests:61): deboogging
-2020-01-16 18:57:46 [INFO ] (loge::tests:62): such information
-2020-01-16 18:57:46 [WARN ] (loge::tests:63): o_O
-2020-01-16 18:57:46 [ERROR] (loge::tests:64): boom
+2020-01-19 22:29:06 [TRACE] simple_log::tests - (line 21) ... one level deep!
+2020-01-19 22:29:06 [DEBUG] simple_log::tests - (line 14) ... deboogging
+2020-01-19 22:29:06 [INFO ] simple_log::tests - (line 15) ... such information
+2020-01-19 22:29:06 [WARN ] simple_log::tests - (line 16) ... o_O
+2020-01-19 22:29:06 [ERROR] simple_log::tests - (line 17) ... boom
 ```
 
 ## Contact
