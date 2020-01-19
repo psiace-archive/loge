@@ -29,7 +29,18 @@ pub extern crate env_logger;
 extern crate log;
 
 use chrono::Local;
-use env_logger::Builder;
+use env_logger::{fmt::{Color, Style, StyledValue}, Builder};
+use log::Level;
+
+fn colored_level<'a>(style: &'a mut Style, level: Level) -> StyledValue<'a, &'static str> {
+    match level {
+        Level::Trace => style.set_color(Color::Cyan).value("TRACE"),
+        Level::Debug => style.set_color(Color::Blue).value("DEBUG"),
+        Level::Info => style.set_color(Color::Green).value("INFO "),
+        Level::Warn => style.set_color(Color::Yellow).value("WARN "),
+        Level::Error => style.set_color(Color::Red).value("ERROR"),
+    }
+}
 
 /// Initializes the global logger with a logger named `loge`.
 ///
@@ -111,11 +122,13 @@ pub fn formatted_builder() -> Builder {
     let mut builder = Builder::new();
 
     builder.format(|formatter, record| {
+        let mut style = formatter.style();
+
         writeln!(
             formatter,
-            "{} [{:<5}] ({}:{}): {}",
+            "{} [{}] {} - (line {}) ... {}",
             Local::now().format("%Y-%m-%d %H:%M:%S"),
-            formatter.default_styled_level(record.level()),
+            colored_level(&mut style, record.level()),
             record.target(),
             record.line().unwrap_or(0),
             record.args()
