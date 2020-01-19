@@ -47,26 +47,3 @@ pub fn formatted_builder() -> Builder {
 
     builder
 }
-
-#[cfg(test)]
-mod tests {
-    use log::{debug, error, info, trace, warn};
-    #[test]
-    fn test_loge() {
-        use crate::init;
-        use std::env;
-
-        env::set_var("RUST_LOG", "trace");
-        init();
-
-        self::deep();
-        debug!("deboogging");
-        info!("such information");
-        warn!("o_O");
-        error!("boom");
-    }
-
-    pub fn deep() {
-        trace!("one level deep!");
-    }
-}
