@@ -1,6 +1,11 @@
 # LOGE
 
-> Imitation is the fastest way to learn.
+[![Crates.io](https://img.shields.io/crates/v/loge.svg)](https://crates.io/crates/loge)
+[![Docs](https://docs.rs/loge/badge.svg)](https://docs.rs/loge)
+[![MIT/APACHE-2.0](https://img.shields.io/crates/l/loge.svg)](https://crates.io/crates/loge)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/PsiACE/loge/Check%20Code?label=workflow)](https://github.com/PsiACE/loge/actions)
+
+> It helps to be diligent in recording and willing to review.
 
 A fork of [pretty-env-logger](https://github.com/seanmonstar/pretty-env-logger) with formatted output for easy analysis.
 
@@ -9,7 +14,7 @@ _**Note**_: Use improved log format from `0.2.0`.
 ## TODO
 
 - [ ] Format
-  - [ ] Simple JSON Logger. 
+  - [ ] Simple JSON Logger.
   - [ ] Colorful, Intuitive.
 - [ ] Analysis
   - [ ] Basic Parser.
