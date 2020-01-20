@@ -6,6 +6,15 @@ A fork of [pretty-env-logger](https://github.com/seanmonstar/pretty-env-logger) 
 
 _**Note**_: Use improved log format from `0.2.0`.
 
+## TODO
+
+- [ ] Format
+  - [ ] Simple JSON Logger. 
+  - [ ] Colorful, Intuitive.
+- [ ] Analysis
+  - [ ] Basic Parser.
+  - [ ] Coarse-grained Chart.
+
 ## Usage
 
 At first, you should add it to your `Cargo.toml` file.
