@@ -71,3 +71,18 @@ jobs:
           components: rustfmt
           override: true
     - run: cargo fmt -- --check
+
+  check_clippy:
+    name: "Check Clippy"
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+    - uses: actions/checkout@v1
+    - name: "Use the latest Rust stable with rustfmt"
+      uses: actions-rs/toolchain@v1
+      with:
+          toolchain: stable
+          profile: minimal
+          components: rustfmt
+          override: true
+    - run: cargo clippy -- --check
