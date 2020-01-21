@@ -83,6 +83,6 @@ jobs:
       with:
           toolchain: stable
           profile: minimal
-          components: rustfmt
+          components: clippy
           override: true
     - run: cargo clippy -- --check
