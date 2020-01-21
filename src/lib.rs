@@ -1,4 +1,4 @@
-#![deny(warnings)]
+#![cfg_attr(test, deny(warnings))]
 #![deny(missing_docs)]
 
 //! A logger configured via an environment variable which writes cancer to
