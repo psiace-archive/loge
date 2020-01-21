@@ -127,17 +127,19 @@ pub fn formatted_builder() -> Builder {
     builder.format(|formatter, record| {
         let mut time_style = formatter.style();
         let mut level_style = formatter.style();
+        let mut target_style = formatter.style();
         let mut line_style = formatter.style();
 
         time_style.set_color(Color::Ansi256(59));
         line_style.set_color(Color::Magenta);
+        target_style.set_bold(true);
 
         writeln!(
             formatter,
             "{} [{}] {} - (line {}) ... {}",
             time_style.value(Local::now().format("%Y-%m-%d %H:%M:%S")),
             colored_level(&mut level_style, record.level()),
-            record.target(),
+            target_style.value(record.target()),
             line_style.value(record.line().unwrap_or(0)),
             record.args()
         )
