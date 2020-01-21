@@ -1,4 +1,4 @@
-# LOGE
+# loge
 
 [![Crates.io](https://img.shields.io/crates/v/loge.svg)](https://crates.io/crates/loge)
 [![Docs](https://docs.rs/loge/badge.svg)](https://docs.rs/loge)
