@@ -78,11 +78,10 @@ jobs:
     timeout-minutes: 2
     steps:
     - uses: actions/checkout@v1
-    - name: "Use the latest Rust stable with rustfmt"
+    - name: "Use the latest Rust stable with clippy"
       uses: actions-rs/toolchain@v1
       with:
           toolchain: stable
-          profile: minimal
           components: clippy
           override: true
     - run: cargo clippy -- --check
