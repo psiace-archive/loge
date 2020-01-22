@@ -9,9 +9,13 @@
 
 A simple logger with formatted output for easy analysis. Free your productivity start with best practices logs.
 
-_**Note**_: Use improved log format from `0.2.0`, the log info will output as `date time [level] target - (line) ... message`:
+_**Note**_: Split for clearer logs from `0.2.3`, the log info will output as `date time [level] target ... message`:
 
 ![loge output](./loge-output.png)
+
+ or `date time [level] file -  (line) ... message`:
+
+![loge fileline output](./loge-fileline-output.png)
 
 ## TODO
 
@@ -29,14 +33,14 @@ At first, you should add it to your `Cargo.toml` file.
 ```toml
 [dependencies]
 log = "0.4.8"
-loge = "0.2.2"
+loge = "0.2.3"
 ```
 
 After that, set the `RUST_LOG` variable in your code and initialize the logger.
 
 ```rust
 env::set_var("RUST_LOG", "trace");
-loge::init();
+loge::init(); // Or `loge::init_fileline();`.
 ```
 
 Just run your project, you will get logs in the terminal.
