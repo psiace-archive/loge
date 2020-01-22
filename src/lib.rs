@@ -2,7 +2,7 @@
 #![deny(missing_docs)]
 
 //! A logger configured via an environment variable which writes cancer to
-//! standard error with colored output for log levels.
+//! standard error with colored output for logs.
 //!
 //! ## Example
 //!
@@ -14,7 +14,7 @@
 //!
 //! fn main() {
 //!     env::set_var("RUST_LOG", "trace");
-//!     loge::init();
+//!     loge::init(); // Or loge::init_fileline();
 //!
 //!     trace!("this is trace level");
 //!     debug!("meet a note");
@@ -59,6 +59,20 @@ pub fn init() {
     try_init().unwrap();
 }
 
+/// Initializes the global logger with a file line logger named `loge`.
+///
+/// This should be called early in the execution of a Rust program, and the
+/// global logger may only be initialized once. Future initialization attempts
+/// will return an error.
+///
+/// # Panics
+///
+/// This function fails to set the global logger if one has already been set.
+#[inline]
+pub fn init_fileline() {
+    try_init_fileline().unwrap();
+}
+
 /// Initializes the global logger with a logger named `loge`.
 ///
 /// This should be called early in the execution of a Rust program, and the
@@ -70,6 +84,19 @@ pub fn init() {
 /// This function fails to set the global logger if one has already been set.
 pub fn try_init() -> Result<(), log::SetLoggerError> {
     try_init_custom_env("RUST_LOG")
+}
+
+/// Initializes the global logger with a file line logger named `loge`.
+///
+/// This should be called early in the execution of a Rust program, and the
+/// global logger may only be initialized once. Future initialization attempts
+/// will return an error.
+///
+/// # Errors
+///
+/// This function fails to set the global logger if one has already been set.
+pub fn try_init_fileline() -> Result<(), log::SetLoggerError> {
+    try_init_fileline_custom_env("RUST_LOG")
 }
 
 /// Initialized the global logger with a logger named `loge`, with a custom variable
@@ -106,9 +133,31 @@ pub fn try_init_custom_env(environment_variable_name: &str) -> Result<(), log::S
     builder.try_init()
 }
 
+/// Initialized the global logger with a file line logger named `loge`, with a custom variable
+/// name.
+///
+/// This should be called early in the execution of a Rust program, and the
+/// global logger may only be initialized once. Future initialization attempts
+/// will return an error.
+///
+/// # Errors
+///
+/// This function fails to set the global logger if one has already been set.
+pub fn try_init_fileline_custom_env(
+    environment_variable_name: &str,
+) -> Result<(), log::SetLoggerError> {
+    let mut builder = formatted_fileline_builder();
+
+    if let Ok(s) = ::std::env::var(environment_variable_name) {
+        builder.parse_filters(&s);
+    }
+
+    builder.try_init()
+}
+
 /// Returns a `env_logger::Builder` for further customization.
 ///
-/// This method will return a colored and formatted) `env_logger::Builder`
+/// This method will return a colored and formatted `env_logger::Builder`
 /// for further customization. Refer to env_logger::Build crate documentation
 /// for further details and usage.
 ///
@@ -128,19 +177,58 @@ pub fn formatted_builder() -> Builder {
         let mut time_style = formatter.style();
         let mut level_style = formatter.style();
         let mut target_style = formatter.style();
-        let mut line_style = formatter.style();
 
         time_style.set_color(Color::Ansi256(59));
-        line_style.set_color(Color::Magenta);
         target_style.set_bold(true);
 
         writeln!(
             formatter,
-            "{} [{}] {} - (line {}) ... {}",
+            "{} [{}] {} ... {}",
             time_style.value(Local::now().format("%Y-%m-%d %H:%M:%S")),
             colored_level(&mut level_style, record.level()),
             target_style.value(record.target()),
-            line_style.value(record.line().unwrap_or(0)),
+            record.args()
+        )
+    });
+
+    builder
+}
+
+/// Returns a `env_logger::Builder` for further customization.
+///
+/// This method will return a colored and file line formatted `env_logger::Builder`
+/// for further customization. Refer to env_logger::Build crate documentation
+/// for further details and usage.
+///
+/// This should be called early in the execution of a Rust program, and the
+/// global logger may only be initialized once. Future initialization attempts
+/// will return an error.
+///
+/// # Errors
+///
+/// This function fails to set the global logger if one has already been set.
+pub fn formatted_fileline_builder() -> Builder {
+    use std::io::Write;
+
+    let mut builder = Builder::new();
+
+    builder.format(|formatter, record| {
+        let mut time_style = formatter.style();
+        let mut level_style = formatter.style();
+        let mut file_style = formatter.style();
+        let mut line_style = formatter.style();
+
+        time_style.set_color(Color::Ansi256(59));
+        file_style.set_bold(true);
+        line_style.set_color(Color::Magenta);
+
+        writeln!(
+            formatter,
+            "{} [{}] {} -  (line {}) ... {}",
+            time_style.value(Local::now().format("%Y-%m-%d %H:%M:%S")),
+            colored_level(&mut level_style, record.level()),
+            file_style.value(record.file().unwrap_or("<unknown>")),
+            line_style.value(record.line().map_or(-1, |v| v as i32)),
             record.args()
         )
     });
