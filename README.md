@@ -29,7 +29,7 @@ At first, you should add it to your `Cargo.toml` file.
 ```toml
 [dependencies]
 log = "0.4.8"
-loge = "0.2.1"
+loge = "0.2.2"
 ```
 
 After that, set the `RUST_LOG` variable in your code and initialize the logger.
