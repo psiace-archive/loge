@@ -5,9 +5,9 @@ mod tests {
     use std::env;
 
     #[test]
-    fn test_loge() {
+    fn test_fileline_loge() {
         env::set_var("RUST_LOG", "trace");
-        loge::init();
+        loge::init_fileline();
 
         self::deep();
         debug!("deboogging");
