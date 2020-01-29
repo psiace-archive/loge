@@ -28,16 +28,16 @@
 
 extern crate chrono;
 pub extern crate env_logger;
+extern crate json;
 extern crate log;
-extern crate serde_json;
 
 use chrono::Local;
 use env_logger::{
     fmt::{Color, Style, StyledValue},
     Builder,
 };
+use json::object;
 use log::Level;
-use serde_json::json;
 use std::{env, str};
 
 fn colored_level<'a>(style: &'a mut Style, level: Level) -> StyledValue<'a, &'static str> {
@@ -309,35 +309,46 @@ pub fn formatted_jsonified_builder() -> Builder {
     let mut builder = Builder::new();
 
     builder.format(|formatter, record| {
+        let time = Local::now().format("%Y-%m-%d %H:%M:%S");
         let level = record.level();
         let target = record.target();
         let file = record.file();
         let line = record.line();
-        let msg = record.args();
+        // Error messages also have a pseudo stack trace.
+        let msg = match record.level() {
+            Level::Error => format!(
+                "{} \n at {}:{}",
+                record.args(),
+                record.file().unwrap_or("unknown_file"),
+                record.line().unwrap_or(0)
+            ),
+            _ => format!("{}", record.args()),
+        };
+        // Get crate name from env.
         let name = env::var("SERVICE_NAME")
             .or_else(|_| env::var("CARGO_PKG_NAME"))
             .unwrap_or_else(|_| String::new());
+        // Get crate version from env.
         let version = env::var("SERVICE_VERSION")
             .or_else(|_| env::var("CARGO_PKG_VERSION"))
             .unwrap_or_else(|_| String::new());
-        let time = Local::now().format("%Y-%m-%d %H:%M:%S");
 
-        let log = json!({
-            "level": level.to_string(),
-            "location": {
-                "file": file,
-                "line": line,
-                "target": target,
+        let json_log = object! {
+            "time" => time.to_string(),
+            "level" => level.to_string(),
+            "message" => msg,
+            "service" => object! {
+                "name" => name,
+                "version" => version,
             },
-            "message": msg,
-            "service": {
-                "name": name,
-                "version": version
+            "location" => object! {
+                "file" => file,
+                "line"=> line,
+                "target"=> target,
             },
-            "time": time.to_string(),
-        });
+        };
 
-        writeln!(formatter, "{}", log,)
+        writeln!(formatter, "{}", json_log)
     });
 
     builder
