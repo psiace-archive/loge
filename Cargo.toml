@@ -1,6 +1,6 @@
 [package]
 name = "loge"
-version = "0.2.3"
+version = "0.3.0"
 authors = ["Chojan Shang <psiace@outlook.com>"]
 edition = "2018"
 description = "A analysis friendly logger with formatted output."
@@ -21,3 +21,4 @@ include = [
 chrono = "0.4"
 env_logger = "0.7"
 log = "0.4"
+serde_json = "1.0"
