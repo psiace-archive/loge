@@ -20,7 +20,7 @@ _**Note**_: Split for clearer logs from `0.2.3`, the log info will output as `da
 ## TODO
 
 - [ ] Format
-  - [x] Simple JSON Logger.
+  - [x] Simple JSON Logger. // Temporary, unoptimized.
   - [x] Colorful, Intuitive.
 - [ ] Analysis
   - [ ] Basic Parser.
@@ -33,7 +33,7 @@ At first, you should add it to your `Cargo.toml` file.
 ```toml
 [dependencies]
 log = "0.4.8"
-loge = "0.3.0"
+loge = "0.3.1"
 ```
 
 After that, set the `RUST_LOG` variable in your code and initialize the logger.
@@ -42,7 +42,7 @@ After that, set the `RUST_LOG` variable in your code and initialize the logger.
 env::set_var("RUST_LOG", "trace");
 loge::init();
 // Or `loge::init_fileline();` for file line logger.
-// Or `loge::init_jsonified();` for jsonified logger.
+// Or `loge::init_jsonified();` for jsonified logger without any color.
 ```
 
 Just run your project, you will get logs in the terminal.
