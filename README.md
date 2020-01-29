@@ -25,6 +25,8 @@ _**Note**_: Split for clearer logs from `0.2.3`, the log info will output as `da
 - [ ] Analysis
   - [ ] Basic Parser.
   - [ ] Coarse-grained Chart.
+- [ ] Others
+  - [ ] Lightweight - As few dependencies as possible.
 
 ## Usage
 
