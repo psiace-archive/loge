@@ -7,23 +7,21 @@
 //! ## Example
 //!
 //! ```
-//! extern crate loge;
-//! #[macro_use] extern crate log;
+//! # extern crate loge;
+//! # #[macro_use] extern crate log;
 //!
-//! use std::env;
+//! # use std::env;
 //!
-//! fn main() {
-//!     env::set_var("RUST_LOG", "trace");
-//!     loge::init();
-//!     // Or loge::init_fileline();
-//!     // Or loge::init_jsonified();
+//! env::set_var("RUST_LOG", "trace");
+//! loge::init();
+//! // Or loge::init_fileline();
+//! // Or loge::init_jsonified();
 //!
-//!     trace!("this is trace level");
-//!     debug!("meet a note");
-//!     info!("everything is normal");
-//!     warn!("be careful");
-//!     error!("something error");
-//! }
+//! trace!("this is trace level");
+//! debug!("meet a note");
+//! info!("everything is normal");
+//! warn!("be careful");
+//! error!("something error");
 //! ```
 
 extern crate chrono;
