@@ -48,6 +48,19 @@ fn colored_level<'a>(style: &'a mut Style, level: Level) -> StyledValue<'a, &'st
     }
 }
 
+// Error messages also have a pseudo stack trace.
+fn error_trace_message(record: &log::Record) -> String {
+    match record.level() {
+        Level::Error => format!(
+            "{} -> {}:{}",
+            record.args(),
+            record.file().unwrap_or("<unknown>"),
+            record.line().map_or(-1, |v| v as i32)
+        ),
+        _ => format!("{}", record.args()),
+    }
+}
+
 /// Initializes the global logger with a logger named `loge`.
 ///
 /// This should be called early in the execution of a Rust program, and the
@@ -233,13 +246,15 @@ pub fn formatted_builder() -> Builder {
         time_style.set_color(Color::Ansi256(59));
         target_style.set_bold(true);
 
+        let msg = error_trace_message(record);
+
         writeln!(
             formatter,
             "{} [{}] {} ... {}",
             time_style.value(Local::now().format("%Y-%m-%d %H:%M:%S")),
             colored_level(&mut level_style, record.level()),
             target_style.value(record.target()),
-            record.args()
+            msg
         )
     });
 
@@ -312,16 +327,7 @@ pub fn formatted_jsonified_builder() -> Builder {
         let target = record.target();
         let file = record.file();
         let line = record.line();
-        // Error messages also have a pseudo stack trace.
-        let msg = match record.level() {
-            Level::Error => format!(
-                "{} \n at {}:{}",
-                record.args(),
-                record.file().unwrap_or("unknown_file"),
-                record.line().unwrap_or(0)
-            ),
-            _ => format!("{}", record.args()),
-        };
+        let msg = error_trace_message(record);
         // Get crate name from env.
         let name = env::var("SERVICE_NAME")
             .or_else(|_| env::var("CARGO_PKG_NAME"))
