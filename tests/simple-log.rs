@@ -5,8 +5,9 @@ mod tests {
     use std::env;
 
     #[test]
-    fn test_loge() {
+    fn test_fileline_loge() {
         env::set_var("RUST_LOG", "trace");
+        env::set_var("LOGE_FORMAT", "target");
         loge::init();
 
         self::deep();

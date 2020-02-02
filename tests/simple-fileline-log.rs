@@ -7,7 +7,8 @@ mod tests {
     #[test]
     fn test_fileline_loge() {
         env::set_var("RUST_LOG", "trace");
-        loge::init_fileline();
+        env::set_var("LOGE_FORMAT", "fileline");
+        loge::init();
 
         self::deep();
         debug!("deboogging");
