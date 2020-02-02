@@ -4,7 +4,8 @@ use std::env;
 
 fn main() {
     env::set_var("RUST_LOG", "trace");
-    loge::init_jsonified();
+    env::set_var("LOGE_FORMAT", "json");
+    loge::init();
 
     self::deep();
     debug!("deboogging");

@@ -4,6 +4,7 @@ use std::env;
 
 fn main() {
     env::set_var("RUST_LOG", "trace");
+    env::set_var("LOGE_FORMAT", "target");
     loge::init();
 
     self::deep();
