@@ -1,4 +1,4 @@
-#![cfg_attr(test, deny(warnings))]
+#![deny(warnings)]
 #![deny(missing_docs)]
 
 //! A logger configured via an environment variable which writes cancer to
@@ -13,9 +13,8 @@
 //! # use std::env;
 //!
 //! env::set_var("RUST_LOG", "trace");
+//! env::set_var("LOGE_FORMAT", "target");
 //! loge::init();
-//! // Or loge::init_fileline();
-//! // Or loge::init_jsonified();
 //!
 //! trace!("this is trace level");
 //! debug!("meet a note");
@@ -24,27 +23,242 @@
 //! error!("something error");
 //! ```
 
+#[cfg(windows)]
+extern crate atty;
+#[cfg(feature = "chrono")]
 extern crate chrono;
-pub extern crate env_logger;
-extern crate json;
+#[cfg(feature = "colored")]
+extern crate colored;
+#[cfg(feature = "json")]
+extern crate json_color;
 extern crate log;
+#[cfg(feature = "json")]
+extern crate serde_json;
+#[cfg(windows)]
+extern crate winapi;
 
+#[cfg(feature = "chrono")]
 use chrono::Local;
-use env_logger::{
-    fmt::{Color, Style, StyledValue},
-    Builder,
-};
-use json::object;
-use log::Level;
-use std::{env, str};
+#[cfg(feature = "colored")]
+use colored::{ColoredString, Colorize};
+use log::{Level, Log, Metadata, Record, SetLoggerError};
 
-fn colored_level<'a>(style: &'a mut Style, level: Level) -> StyledValue<'a, &'static str> {
+struct LogeLogger {
+    level: Level,
+    config: LogeFormat,
+}
+
+/// `LogeFormat` is used to choose log format.
+pub enum LogeFormat {
+    /// log format with `record.target()`
+    Target,
+    /// log format with `record.file()` and `record.line()`
+    Fileline,
+    /// json log format
+    #[cfg(feature = "json")]
+    Json,
+}
+
+impl Log for LogeLogger {
+    fn enabled(&self, metadata: &Metadata) -> bool {
+        metadata.level() <= self.level
+    }
+
+    fn log(&self, record: &Record) {
+        let level = record.level();
+        let target = if !record.target().is_empty() {
+            record.target()
+        } else {
+            record.module_path().unwrap_or_default()
+        };
+        let file = record.file().unwrap_or("<unknown>");
+        let line = record.line().map_or(-1, |v| v as i32);
+        let msg = error_trace_message(record);
+        #[cfg(feature = "colored")]
+        {
+            let color_level = colored_level(record.level());
+            match self.config {
+                LogeFormat::Target => {
+                    #[cfg(feature = "chrono")]
+                    {
+                        let time =
+                            Local::now().format("%Y-%m-%d %H:%M:%S%.3f").to_string().palette(59);
+                        println!("{} [{:<5}] {} ... {}", time, color_level, target.bold(), msg)
+                    }
+                    #[cfg(not(feature = "chrono"))]
+                    {
+                        println!("{:<5} {} ... {}", color_level, target.bold(), msg)
+                    }
+                }
+                LogeFormat::Fileline => {
+                    #[cfg(feature = "chrono")]
+                    {
+                        let time =
+                            Local::now().format("%Y-%m-%d %H:%M:%S%.3f").to_string().palette(59);
+                        println!(
+                            "{} [{:<5}] {} -  (line {}) ... {}",
+                            time,
+                            color_level,
+                            file.bold(),
+                            line.to_string().magenta(),
+                            msg
+                        )
+                    }
+                    #[cfg(not(feature = "chrono"))]
+                    {
+                        println!(
+                            "{:<5} {} -  (line {}) ... {}",
+                            color_level,
+                            file.bold(),
+                            line.to_string().magenta(),
+                            msg
+                        )
+                    }
+                }
+                #[cfg(feature = "json")]
+                LogeFormat::Json => {
+                    use json_color::{Color, Colorizer};
+                    use serde_json::json;
+
+                    let colorizer = Colorizer::new()
+                        .number(Color::Magenta)
+                        .string(Color::Green)
+                        .key(Color::Cyan)
+                        .build();
+
+                    let time = Local::now().format("%Y-%m-%d %H:%M:%S%.3f").to_string();
+                    // Get crate name from env.
+                    let name = ::std::env::var("SERVICE_NAME")
+                        .or_else(|_| ::std::env::var("CARGO_PKG_NAME"))
+                        .unwrap_or_else(|_| String::new());
+                    // Get crate version from env.
+                    let version = ::std::env::var("SERVICE_VERSION")
+                        .or_else(|_| ::std::env::var("CARGO_PKG_VERSION"))
+                        .unwrap_or_else(|_| String::new());
+
+                    let jsonified = json!({
+                        "time" : time,
+                        "level" : level.to_string(),
+                        "message" : msg,
+                        "service" : json!({
+                            "name" : name,
+                            "version" : version,
+                        }),
+                        "location" : json!({
+                            "file" : file,
+                            "line" : line,
+                            "target" : target,
+                        }),
+                    });
+
+                    if let Ok(jsonified_log) = colorizer.colorize_json_str(&jsonified.to_string()) {
+                        println!("{}", jsonified_log);
+                    }
+                }
+            }
+        }
+        #[cfg(not(feature = "colored"))]
+        {
+            match self.config {
+                LogeFormat::Target => {
+                    #[cfg(feature = "chrono")]
+                    {
+                        let time = Local::now().format("%Y-%m-%d %H:%M:%S%.3f");
+                        println!("{} [{:<5}] {} ... {}", time, level, target, msg)
+                    }
+                    #[cfg(not(feature = "chrono"))]
+                    {
+                        println!("{:<5} {} ... {}", level, target, msg)
+                    }
+                }
+                LogeFormat::Fileline => {
+                    #[cfg(feature = "chrono")]
+                    {
+                        let time = Local::now().format("%Y-%m-%d %H:%M:%S%.3f");
+                        println!("{} [{:<5}] {} -  (line {}) ... {}", time, level, file, line, msg)
+                    }
+                    #[cfg(not(feature = "chrono"))]
+                    {
+                        println!("{:<5} {} -  (line {}) ... {}", level, file, line, msg)
+                    }
+                }
+                #[cfg(feature = "json")]
+                LogeFormat::Json => {
+                    use serde_json::json;
+
+                    let time = Local::now().format("%Y-%m-%d %H:%M:%S%.3f").to_string();
+                    // Get crate name from env.
+                    let name = ::std::env::var("SERVICE_NAME")
+                        .or_else(|_| ::std::env::var("CARGO_PKG_NAME"))
+                        .unwrap_or_else(|_| String::new());
+                    // Get crate version from env.
+                    let version = ::std::env::var("SERVICE_VERSION")
+                        .or_else(|_| ::std::env::var("CARGO_PKG_VERSION"))
+                        .unwrap_or_else(|_| String::new());
+
+                    let jsonified = json!({
+                        "time" : time,
+                        "level" : level.to_string(),
+                        "message" : msg,
+                        "service" : json!({
+                            "name" : name,
+                            "version" : version,
+                        }),
+                        "location" : json!({
+                            "file" : file.to_string(),
+                            "line" : line.to_string(),
+                            "target" : target.to_string(),
+                        }),
+                    });
+
+                    println!("{}", jsonified);
+                }
+            }
+        }
+    }
+
+    fn flush(&self) {}
+}
+
+// Set up color terminal for windows.
+#[cfg(windows)]
+fn set_up_color_terminal() {
+    use atty::Stream;
+
+    if atty::is(Stream::Stdout) {
+        unsafe {
+            use winapi::um::consoleapi::*;
+            use winapi::um::handleapi::*;
+            use winapi::um::processenv::*;
+            use winapi::um::winbase::*;
+            use winapi::um::wincon::*;
+
+            let stdout = GetStdHandle(STD_OUTPUT_HANDLE);
+
+            if stdout == INVALID_HANDLE_VALUE {
+                return;
+            }
+
+            let mut mode: winapi::shared::minwindef::DWORD = 0;
+
+            if GetConsoleMode(stdout, &mut mode) == 0 {
+                return;
+            }
+
+            SetConsoleMode(stdout, mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+        }
+    }
+}
+
+// Provide color for `level`.
+#[cfg(feature = "colored")]
+fn colored_level(level: Level) -> ColoredString {
     match level {
-        Level::Trace => style.set_color(Color::Cyan).value("TRACE"),
-        Level::Debug => style.set_color(Color::Blue).value("DEBUG"),
-        Level::Info => style.set_color(Color::Green).value("INFO "),
-        Level::Warn => style.set_color(Color::Yellow).value("WARN "),
-        Level::Error => style.set_color(Color::Red).value("ERROR"),
+        Level::Trace => level.to_string().cyan(),
+        Level::Debug => level.to_string().blue(),
+        Level::Info => level.to_string().green(),
+        Level::Warn => level.to_string().yellow(),
+        Level::Error => level.to_string().red(),
     }
 }
 
@@ -61,7 +275,30 @@ fn error_trace_message(record: &log::Record) -> String {
     }
 }
 
-/// Initializes the global logger with a logger named `loge`.
+// Parse level filters from `&str`.
+fn parse_filters(environment_variable_name: &str) -> Level {
+    match environment_variable_name {
+        "trace" => Level::Trace,
+        "debug" => Level::Debug,
+        "info" => Level::Info,
+        "warn" => Level::Warn,
+        "error" => Level::Error,
+        _ => Level::Error,
+    }
+}
+
+// Parse format filters from `&str`.
+fn parse_formats(environment_variable_name: &str) -> LogeFormat {
+    match environment_variable_name {
+        "target" => LogeFormat::Target,
+        "fileline" => LogeFormat::Fileline,
+        #[cfg(feature = "json")]
+        "json" => LogeFormat::Json,
+        _ => LogeFormat::Target,
+    }
+}
+
+/// Initializes the global logger.
 ///
 /// This should be called early in the execution of a Rust program, and the
 /// global logger may only be initialized once. Future initialization attempts
@@ -75,34 +312,6 @@ pub fn init() {
     try_init().unwrap();
 }
 
-/// Initializes the global logger with a file line logger named `loge`.
-///
-/// This should be called early in the execution of a Rust program, and the
-/// global logger may only be initialized once. Future initialization attempts
-/// will return an error.
-///
-/// # Panics
-///
-/// This function fails to set the global logger if one has already been set.
-#[inline]
-pub fn init_fileline() {
-    try_init_fileline().unwrap();
-}
-
-/// Initializes the global logger with a jsonified logger named `loge`.
-///
-/// This should be called early in the execution of a Rust program, and the
-/// global logger may only be initialized once. Future initialization attempts
-/// will return an error.
-///
-/// # Panics
-///
-/// This function fails to set the global logger if one has already been set.
-#[inline]
-pub fn init_jsonified() {
-    try_init_jsonified().unwrap();
-}
-
 /// Initializes the global logger with a logger named `loge`.
 ///
 /// This should be called early in the execution of a Rust program, and the
@@ -113,10 +322,23 @@ pub fn init_jsonified() {
 ///
 /// This function fails to set the global logger if one has already been set.
 pub fn try_init() -> Result<(), log::SetLoggerError> {
-    try_init_custom_env("RUST_LOG")
+    try_init_custom_env("RUST_LOG", "LOGE_FORMAT")
 }
 
-/// Initializes the global logger with a file line logger named `loge`.
+/// Initialized the global logger with a logger named `loge`, with a custom config
+///
+/// This should be called early in the execution of a Rust program, and the
+/// global logger may only be initialized once. Future initialization attempts
+/// will return an error.
+///
+/// # Panics
+///
+/// This function fails to set the global logger if one has already been set.
+pub fn init_custom(level: Level, config: LogeFormat) {
+    try_init_custom(level, config).unwrap();
+}
+
+/// Initialized the global logger with a logger named `loge`, with a custom config
 ///
 /// This should be called early in the execution of a Rust program, and the
 /// global logger may only be initialized once. Future initialization attempts
@@ -125,24 +347,17 @@ pub fn try_init() -> Result<(), log::SetLoggerError> {
 /// # Errors
 ///
 /// This function fails to set the global logger if one has already been set.
-pub fn try_init_fileline() -> Result<(), log::SetLoggerError> {
-    try_init_fileline_custom_env("RUST_LOG")
+pub fn try_init_custom(level: Level, config: LogeFormat) -> Result<(), SetLoggerError> {
+    #[cfg(all(windows, feature = "colored"))]
+    set_up_color_terminal();
+
+    let logger = LogeLogger { level, config };
+    log::set_max_level(level.to_level_filter());
+    log::set_boxed_logger(Box::new(logger))?;
+    Ok(())
 }
 
-/// Initializes the global logger with a jsonified logger named `loge`.
-///
-/// This should be called early in the execution of a Rust program, and the
-/// global logger may only be initialized once. Future initialization attempts
-/// will return an error.
-///
-/// # Errors
-///
-/// This function fails to set the global logger if one has already been set.
-pub fn try_init_jsonified() -> Result<(), log::SetLoggerError> {
-    try_init_jsonified_custom_env("RUST_LOG")
-}
-
-/// Initialized the global logger with a logger named `loge`, with a custom variable
+/// Initialized the global logger with a logger named `loge`, with a custom custom variable
 /// name.
 ///
 /// This should be called early in the execution of a Rust program, and the
@@ -152,11 +367,11 @@ pub fn try_init_jsonified() -> Result<(), log::SetLoggerError> {
 /// # Panics
 ///
 /// This function fails to set the global logger if one has already been set.
-pub fn init_custom_env(environment_variable_name: &str) {
-    try_init_custom_env(environment_variable_name).unwrap();
+pub fn init_custom_env(environment_variable_log: &str, environment_variable_format: &str) {
+    try_init_custom_env(environment_variable_log, environment_variable_format).unwrap();
 }
 
-/// Initialized the global logger with a logger named `loge`, with a custom variable
+/// Initialized the global logger with a logger named `loge`, with a custom custom variable
 /// name.
 ///
 /// This should be called early in the execution of a Rust program, and the
@@ -166,194 +381,20 @@ pub fn init_custom_env(environment_variable_name: &str) {
 /// # Errors
 ///
 /// This function fails to set the global logger if one has already been set.
-pub fn try_init_custom_env(environment_variable_name: &str) -> Result<(), log::SetLoggerError> {
-    let mut builder = formatted_builder();
+pub fn try_init_custom_env(
+    environment_variable_log: &str,
+    environment_variable_format: &str,
+) -> Result<(), SetLoggerError> {
+    #[cfg(all(windows, feature = "colored"))]
+    set_up_color_terminal();
 
-    if let Ok(s) = ::std::env::var(environment_variable_name) {
-        builder.parse_filters(&s);
+    if let Ok(s1) = ::std::env::var(environment_variable_log) {
+        if let Ok(s2) = ::std::env::var(environment_variable_format) {
+            let level = parse_filters(&s1);
+            let config = parse_formats(&s2);
+
+            try_init_custom(level, config).unwrap();
+        }
     }
-
-    builder.try_init()
-}
-
-/// Initialized the global logger with a file line logger named `loge`, with a custom variable
-/// name.
-///
-/// This should be called early in the execution of a Rust program, and the
-/// global logger may only be initialized once. Future initialization attempts
-/// will return an error.
-///
-/// # Errors
-///
-/// This function fails to set the global logger if one has already been set.
-pub fn try_init_fileline_custom_env(
-    environment_variable_name: &str,
-) -> Result<(), log::SetLoggerError> {
-    let mut builder = formatted_fileline_builder();
-
-    if let Ok(s) = ::std::env::var(environment_variable_name) {
-        builder.parse_filters(&s);
-    }
-
-    builder.try_init()
-}
-
-/// Initialized the global logger with a jsonified logger named `loge`, with a custom variable
-/// name.
-///
-/// This should be called early in the execution of a Rust program, and the
-/// global logger may only be initialized once. Future initialization attempts
-/// will return an error.
-///
-/// # Errors
-///
-/// This function fails to set the global logger if one has already been set.
-pub fn try_init_jsonified_custom_env(
-    environment_variable_name: &str,
-) -> Result<(), log::SetLoggerError> {
-    let mut builder = formatted_jsonified_builder();
-
-    if let Ok(s) = ::std::env::var(environment_variable_name) {
-        builder.parse_filters(&s);
-    }
-
-    builder.try_init()
-}
-
-/// Returns a `env_logger::Builder` for further customization.
-///
-/// This method will return a colored and formatted `env_logger::Builder`
-/// for further customization. Refer to env_logger::Build crate documentation
-/// for further details and usage.
-///
-/// This should be called early in the execution of a Rust program, and the
-/// global logger may only be initialized once. Future initialization attempts
-/// will return an error.
-///
-/// # Errors
-///
-/// This function fails to set the global logger if one has already been set.
-pub fn formatted_builder() -> Builder {
-    use std::io::Write;
-
-    let mut builder = Builder::new();
-
-    builder.format(|formatter, record| {
-        let mut time_style = formatter.style();
-        let mut level_style = formatter.style();
-        let mut target_style = formatter.style();
-
-        time_style.set_color(Color::Ansi256(59));
-        target_style.set_bold(true);
-
-        let msg = error_trace_message(record);
-
-        writeln!(
-            formatter,
-            "{} [{}] {} ... {}",
-            time_style.value(Local::now().format("%Y-%m-%d %H:%M:%S%.3f")),
-            colored_level(&mut level_style, record.level()),
-            target_style.value(record.target()),
-            msg
-        )
-    });
-
-    builder
-}
-
-/// Returns a `env_logger::Builder` for further customization.
-///
-/// This method will return a colored and file line formatted `env_logger::Builder`
-/// for further customization. Refer to env_logger::Build crate documentation
-/// for further details and usage.
-///
-/// This should be called early in the execution of a Rust program, and the
-/// global logger may only be initialized once. Future initialization attempts
-/// will return an error.
-///
-/// # Errors
-///
-/// This function fails to set the global logger if one has already been set.
-pub fn formatted_fileline_builder() -> Builder {
-    use std::io::Write;
-
-    let mut builder = Builder::new();
-
-    builder.format(|formatter, record| {
-        let mut time_style = formatter.style();
-        let mut level_style = formatter.style();
-        let mut file_style = formatter.style();
-        let mut line_style = formatter.style();
-
-        time_style.set_color(Color::Ansi256(59));
-        file_style.set_bold(true);
-        line_style.set_color(Color::Magenta);
-
-        writeln!(
-            formatter,
-            "{} [{}] {} -  (line {}) ... {}",
-            time_style.value(Local::now().format("%Y-%m-%d %H:%M:%S%.3f")),
-            colored_level(&mut level_style, record.level()),
-            file_style.value(record.file().unwrap_or("<unknown>")),
-            line_style.value(record.line().map_or(-1, |v| v as i32)),
-            record.args()
-        )
-    });
-
-    builder
-}
-
-/// Returns a `env_logger::Builder` for further customization.
-///
-/// This method will return a colored and jsonified formatted `env_logger::Builder`
-/// for further customization. Refer to env_logger::Build crate documentation
-/// for further details and usage.
-///
-/// This should be called early in the execution of a Rust program, and the
-/// global logger may only be initialized once. Future initialization attempts
-/// will return an error.
-///
-/// # Errors
-///
-/// This function fails to set the global logger if one has already been set.
-pub fn formatted_jsonified_builder() -> Builder {
-    use std::io::Write;
-
-    let mut builder = Builder::new();
-
-    builder.format(|formatter, record| {
-        let time = Local::now().format("%Y-%m-%d %H:%M:%S%.3f");
-        let level = record.level();
-        let target = record.target();
-        let file = record.file();
-        let line = record.line();
-        let msg = error_trace_message(record);
-        // Get crate name from env.
-        let name = env::var("SERVICE_NAME")
-            .or_else(|_| env::var("CARGO_PKG_NAME"))
-            .unwrap_or_else(|_| String::new());
-        // Get crate version from env.
-        let version = env::var("SERVICE_VERSION")
-            .or_else(|_| env::var("CARGO_PKG_VERSION"))
-            .unwrap_or_else(|_| String::new());
-
-        let json_log = object! {
-            "time" => time.to_string(),
-            "level" => level.to_string(),
-            "message" => msg,
-            "service" => object! {
-                "name" => name,
-                "version" => version,
-            },
-            "location" => object! {
-                "file" => file,
-                "line"=> line,
-                "target"=> target,
-            },
-        };
-
-        writeln!(formatter, "{}", json_log)
-    });
-
-    builder
+    Ok(())
 }
