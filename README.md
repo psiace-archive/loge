@@ -9,24 +9,54 @@
 
 A simple logger with formatted output for easy analysis. Free your productivity start with best practices logs.
 
-_**Note**_: Split for clearer logs from `0.2.3`, the log info will output as `date time [level] target ... message`:
+`loge` is currently controlled by features and environment variables:
 
-![loge output](./loge-output.png)
+- If you need to record time, enable `chrono`;
+- When you enable `json`, you also need to enable `chrono`;
+- For pretty output, enable `colored`.
+- By default, we turn on all three features.
+- You can choose one of three formats: `target`, `fileline` or `json`. (Set environment variable `LOGE_FORMAT`.)
 
- or `date time [level] file -  (line) ... message`:
+_**Examples**_:
 
-![loge fileline output](./loge-fileline-output.png)
+- *target*: `date time [level] target ... message`:
+
+    ![loge output](./loge-output.png)
+
+- *fileline*: `date time [level] file -  (line) ... message`:
+
+    ![loge fileline output](./loge-fileline-output.png)
+
+- *json*:
+
+    ```JSON
+    {
+    "time": "2020-02-02 18:33:33.645",
+    "level": "ERROR",
+    "message": "boom -> tests/simple-jsonified-log.rs:17",
+    "service": {
+        "name": "loge",
+        "version": "0.3.1"
+    },
+    "location": {
+        "file": "tests/simple-jsonified-log.rs",
+        "line": 17,
+        "target": "simple_jsonified_log::tests"
+    }
+    }
+    ```
 
 ## TODO
 
 - [ ] Format
-  - [x] Simple JSON Logger. // Temporary, unoptimized.
+  - [x] Simple JSON Logger. // Unoptimized.
   - [x] Colorful, Intuitive.
 - [ ] Analysis
   - [ ] Basic Parser.
   - [ ] Coarse-grained Chart.
 - [ ] Others
-  - [ ] Lightweight - As few dependencies as possible.
+  - [x] Lightweight - As few dependencies as possible.
+  - [ ] More flexible and reliable configuration.
 
 ## Usage
 
@@ -35,16 +65,15 @@ At first, you should add it to your `Cargo.toml` file.
 ```toml
 [dependencies]
 log = "0.4.8"
-loge = "0.3.1"
+loge = "0.4.0"
 ```
 
 After that, set the `RUST_LOG` variable in your code and initialize the logger.
 
 ```rust
 env::set_var("RUST_LOG", "trace");
+env::set_var("LOGE_FORMAT", "target"); // `fileline` or `json`(need enable `json` and `chrono`)
 loge::init();
-// Or `loge::init_fileline();` for file line logger.
-// Or `loge::init_jsonified();` for jsonified logger without any color.
 ```
 
 Just run your project, you will get logs in the terminal.
@@ -64,4 +93,5 @@ Licensed under either of:
 
 ## Acknowledge
 
-- Thank you [Sean McArthur](https://seanmonstar.com) for [`pretty_env_log`](https://github.com/seanmonstar/pretty-env-logger), which this is based on.
+- Thank you [Sean McArthur](https://seanmonstar.com) for [`pretty_env_log`](https://github.com/seanmonstar/pretty-env-logger).
+- Thank you [Sam Clements](https://mastodon.social/@borntyping) for [`rust-simple_logger`](https://github.com/borntyping/rust-simple_logger).
