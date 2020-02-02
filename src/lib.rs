@@ -251,7 +251,7 @@ pub fn formatted_builder() -> Builder {
         writeln!(
             formatter,
             "{} [{}] {} ... {}",
-            time_style.value(Local::now().format("%Y-%m-%d %H:%M:%S")),
+            time_style.value(Local::now().format("%Y-%m-%d %H:%M:%S%.3f")),
             colored_level(&mut level_style, record.level()),
             target_style.value(record.target()),
             msg
@@ -292,7 +292,7 @@ pub fn formatted_fileline_builder() -> Builder {
         writeln!(
             formatter,
             "{} [{}] {} -  (line {}) ... {}",
-            time_style.value(Local::now().format("%Y-%m-%d %H:%M:%S")),
+            time_style.value(Local::now().format("%Y-%m-%d %H:%M:%S%.3f")),
             colored_level(&mut level_style, record.level()),
             file_style.value(record.file().unwrap_or("<unknown>")),
             line_style.value(record.line().map_or(-1, |v| v as i32)),
@@ -322,7 +322,7 @@ pub fn formatted_jsonified_builder() -> Builder {
     let mut builder = Builder::new();
 
     builder.format(|formatter, record| {
-        let time = Local::now().format("%Y-%m-%d %H:%M:%S");
+        let time = Local::now().format("%Y-%m-%d %H:%M:%S%.3f");
         let level = record.level();
         let target = record.target();
         let file = record.file();
