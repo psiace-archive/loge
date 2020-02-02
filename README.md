@@ -13,21 +13,21 @@ A simple logger with formatted output for easy analysis. Free your productivity 
 
 - If you need to record time, enable `chrono`;
 - When you enable `json`, you also need to enable `chrono`;
-- For pretty output, enable `colored`.
+- For pretty output, enable `colored`. // Now, the `date` and `time` in log are not colored.
 - By default, we turn on all three features.
 - You can choose one of three formats: `target`, `fileline` or `json`. (Set environment variable `LOGE_FORMAT`.)
 
 _**Examples**_:
 
-- *target*: `date time [level] target ... message`:
+- *target*: `date time [level] target ... message`(enable `chrono`) or `level target ... message`:
 
     ![loge output](./loge-output.png)
 
-- *fileline*: `date time [level] file -  (line) ... message`:
+- *fileline*: `date time [level] file -  (line) ... message`(enable `chrono`) or `level file -  (line) ... message`:
 
     ![loge fileline output](./loge-fileline-output.png)
 
-- *json*:
+- *json*: You should enable `json` and `chrono`; for pretty output, enable `colored`.
 
     ```JSON
     {

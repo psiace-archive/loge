@@ -25,7 +25,7 @@ json = ["serde_json", "json-color"]
 log = { version = "0.4", features = ["std"] }
 
 chrono = { version = "0.4", optional = true }
-colored = { git = "https://github.com/tforgione/colored.git", branch = "master", optional = true}
+colored = { version = "1.9", optional = true}
 serde_json = { version = "1.0", optional = true }
 json-color = { version = "0.7", optional = true }
 
