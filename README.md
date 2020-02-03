@@ -23,13 +23,13 @@ _**Examples**_:
 
     ![loge output](./loge-output.png)
 
-- *fileline*: `date time [level] file -  (line) ... message`(enable `chrono`) or `level file -  (line) ... message`:
+- *fileline*: `date time [level] file - target (line) ... message`(enable `chrono`) or `level file - target (line) ... message`:
 
     ![loge fileline output](./loge-fileline-output.png)
 
 - *json*: You should enable `json` and `chrono`; for pretty output, enable `colored`.
 
-    ```JSON
+    ```json
     {
     "time": "2020-02-02 18:33:33.645",
     "level": "ERROR",
