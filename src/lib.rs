@@ -94,10 +94,11 @@ impl Log for LogeLogger {
                     {
                         let time = Local::now().format("%Y-%m-%d %H:%M:%S%.3f").to_string();
                         println!(
-                            "{} [{:<5}] {} -  (line {}) ... {}",
+                            "{} [{:<5}] {} - {} (line {}) ... {}",
                             time,
                             color_level,
                             file.bold(),
+                            target.bold(),
                             line.to_string().magenta(),
                             msg
                         )
@@ -105,9 +106,10 @@ impl Log for LogeLogger {
                     #[cfg(not(feature = "chrono"))]
                     {
                         println!(
-                            "{:<5} {} -  (line {}) ... {}",
+                            "{:<5} {} - {} (line {}) ... {}",
                             color_level,
                             file.bold(),
+                            target.bold(),
                             line.to_string().magenta(),
                             msg
                         )
@@ -173,11 +175,14 @@ impl Log for LogeLogger {
                     #[cfg(feature = "chrono")]
                     {
                         let time = Local::now().format("%Y-%m-%d %H:%M:%S%.3f");
-                        println!("{} [{:<5}] {} -  (line {}) ... {}", time, level, file, line, msg)
+                        println!(
+                            "{} [{:<5}] {} - {} (line {}) ... {}",
+                            time, level, file, target, line, msg
+                        )
                     }
                     #[cfg(not(feature = "chrono"))]
                     {
-                        println!("{:<5} {} -  (line {}) ... {}", level, file, line, msg)
+                        println!("{:<5} {} - {} (line {}) ... {}", level, file, target, line, msg)
                     }
                 }
                 #[cfg(feature = "json")]
