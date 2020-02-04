@@ -13,7 +13,7 @@ A simple logger with formatted output for easy analysis. Free your productivity 
 
 - If you need to record time, enable `chrono`;
 - When you enable `json`, you also need to enable `chrono`;
-- For pretty output, enable `colored`. // Now, the `date` and `time` in log are not colored.
+- For pretty output, enable `colored`.
 - By default, we turn on all three features.
 - You can choose one of three formats: `target`, `fileline` or `json`. (Set environment variable `LOGE_FORMAT`.)
 
@@ -21,28 +21,28 @@ _**Examples**_:
 
 - *target*: `date time [level] target ... message`(enable `chrono`) or `level target ... message`:
 
-    ![loge output](./loge-output.png)
+    ![loge output](./screenshot/loge-output.png)
 
 - *fileline*: `date time [level] file - target (line) ... message`(enable `chrono`) or `level file - target (line) ... message`:
 
-    ![loge fileline output](./loge-fileline-output.png)
+    ![loge fileline output](./screenshot/loge-fileline-output.png)
 
 - *json*: You should enable `json` and `chrono`; for pretty output, enable `colored`.
 
     ```json
     {
-    "time": "2020-02-02 18:33:33.645",
-    "level": "ERROR",
-    "message": "boom -> tests/simple-jsonified-log.rs:17",
-    "service": {
+      "time": "2020-02-02 18:33:33.645",
+      "level": "ERROR",
+      "message": "boom -> tests/simple-jsonified-log.rs:17",
+      "service": {
         "name": "loge",
-        "version": "0.3.1"
-    },
-    "location": {
+        "version": "0.4.1"
+      },
+      "location": {
         "file": "tests/simple-jsonified-log.rs",
         "line": 17,
         "target": "simple_jsonified_log::tests"
-    }
+      }
     }
     ```
 
@@ -56,7 +56,8 @@ _**Examples**_:
   - [ ] Coarse-grained Chart.
 - [ ] Others
   - [x] Lightweight - As few dependencies as possible.
-  - [ ] More flexible and reliable configuration.
+  - [ ] Clear architecture and flexible configuration.
+  - [ ] Asynchronous.
 
 ## Usage
 
@@ -65,14 +66,14 @@ At first, you should add it to your `Cargo.toml` file.
 ```toml
 [dependencies]
 log = "0.4.8"
-loge = "0.4.0"
+loge = "0.4.1"
 ```
 
-After that, set the `RUST_LOG` variable in your code and initialize the logger.
+After that, set the `RUST_LOG` & `LOGE_FORMAT` variable in your code and initialize the logger.
 
 ```rust
-env::set_var("RUST_LOG", "trace");
-env::set_var("LOGE_FORMAT", "target"); // `fileline` or `json`(need enable `json` and `chrono`)
+std::env::set_var("RUST_LOG", "trace");
+std::env::set_var("LOGE_FORMAT", "target"); // `fileline` or `json`(need enable `json` and `chrono`)
 loge::init();
 ```
 
