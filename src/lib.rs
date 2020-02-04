@@ -82,7 +82,13 @@ impl Log for LogeLogger {
                     #[cfg(feature = "chrono")]
                     {
                         let time = Local::now().format("%Y-%m-%d %H:%M:%S%.3f").to_string();
-                        println!("{} [{:<5}] {} ... {}", time, color_level, target.bold(), msg)
+                        println!(
+                            "{} [{:<5}] {} ... {}",
+                            time.bright_black(),
+                            color_level,
+                            target.bold(),
+                            msg
+                        )
                     }
                     #[cfg(not(feature = "chrono"))]
                     {
@@ -95,7 +101,7 @@ impl Log for LogeLogger {
                         let time = Local::now().format("%Y-%m-%d %H:%M:%S%.3f").to_string();
                         println!(
                             "{} [{:<5}] {} - {} (line {}) ... {}",
-                            time,
+                            time.bright_black(),
                             color_level,
                             file.bold(),
                             target.bold(),
