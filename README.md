@@ -46,6 +46,8 @@ _**Examples**_:
     }
     ```
 
+- *file*: If you want to print log to a file, enable it, and you will see output both in terminal and file.
+
 ## TODO
 
 - [ ] Format
@@ -58,6 +60,7 @@ _**Examples**_:
   - [x] Lightweight - As few dependencies as possible.
   - [ ] Clear architecture and flexible configuration.
   - [ ] Asynchronous.
+  - [x] Output to file.
 
 ## Usage
 
@@ -66,7 +69,7 @@ At first, you should add it to your `Cargo.toml` file.
 ```toml
 [dependencies]
 log = "0.4.8"
-loge = "0.4.1"
+loge = "0.4.2"
 ```
 
 After that, set the `RUST_LOG` & `LOGE_FORMAT` variable in your code and initialize the logger.
@@ -74,7 +77,8 @@ After that, set the `RUST_LOG` & `LOGE_FORMAT` variable in your code and initial
 ```rust
 std::env::set_var("RUST_LOG", "trace");
 std::env::set_var("LOGE_FORMAT", "target"); // `fileline` or `json`(need enable `json` and `chrono`)
-loge::init();
+loge::init(); // If you enable `file`, you can't use this func.
+// Or `loge::init_with_file("your-app.log");`, but need enable `file`, and will see output both in terminal and file. 
 ```
 
 Just run your project, you will get logs in the terminal.
