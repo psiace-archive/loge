@@ -100,3 +100,4 @@ Licensed under either of:
 
 - Thank you [Sean McArthur](https://seanmonstar.com) for [`pretty_env_log`](https://github.com/seanmonstar/pretty-env-logger).
 - Thank you [Sam Clements](https://mastodon.social/@borntyping) for [`rust-simple_logger`](https://github.com/borntyping/rust-simple_logger).
+- Thank you [Christopher Blanchard](https://github.com/lambdaxymox) for [`file-logger`](https://github.com/lambdaxymox/file-logger).
