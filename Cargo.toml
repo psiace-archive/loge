@@ -1,6 +1,6 @@
 [package]
 name = "loge"
-version = "0.4.1"
+version = "0.4.2"
 authors = ["Chojan Shang <psiace@outlook.com>"]
 edition = "2018"
 description = "A analysis friendly logger with formatted output."
@@ -20,6 +20,7 @@ include = [
 [features]
 default = ["chrono", "colored", "json"]
 json = ["serde_json", "json-color"]
+file = []
 
 [dependencies]
 log = { version = "0.4", features = ["std"] }
