@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1586711399350,
+  "lastUpdate": 1591593390352,
   "repoUrl": "https://github.com/PsiACE/loge",
   "entries": {
     "Rust Benchmark": [
@@ -95,6 +95,54 @@ window.BENCHMARK_DATA = {
             "name": "b40_suppressed_logs",
             "value": 215849,
             "range": "± 31661",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "psiace@outlook.com",
+            "name": "Chojan Shang",
+            "username": "PsiACE"
+          },
+          "committer": {
+            "email": "psiace@outlook.com",
+            "name": "Chojan Shang",
+            "username": "PsiACE"
+          },
+          "distinct": true,
+          "id": "ca450b5a494863af82f02d6d620fd3be5dffcfe6",
+          "message": ":bookmark: Bump to 0.4.2.",
+          "timestamp": "2020-06-08T13:13:57+08:00",
+          "tree_id": "84ad62152f3680113a02a1582ccb0db3f2fb15f1",
+          "url": "https://github.com/PsiACE/loge/commit/ca450b5a494863af82f02d6d620fd3be5dffcfe6"
+        },
+        "date": 1591593389693,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "b10_no_logger_active",
+            "value": 53,
+            "range": "± 7",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "b20_initialize_logger",
+            "value": 0,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "b30_relevant_logs",
+            "value": 227476,
+            "range": "± 21517",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "b40_suppressed_logs",
+            "value": 218687,
+            "range": "± 24539",
             "unit": "ns/iter"
           }
         ]
