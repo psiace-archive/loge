@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1591593390352,
+  "lastUpdate": 1591593672858,
   "repoUrl": "https://github.com/PsiACE/loge",
   "entries": {
     "Rust Benchmark": [
@@ -143,6 +143,54 @@ window.BENCHMARK_DATA = {
             "name": "b40_suppressed_logs",
             "value": 218687,
             "range": "± 24539",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "psiace@outlook.com",
+            "name": "Chojan Shang",
+            "username": "PsiACE"
+          },
+          "committer": {
+            "email": "psiace@outlook.com",
+            "name": "Chojan Shang",
+            "username": "PsiACE"
+          },
+          "distinct": true,
+          "id": "91b670f19bd5ca83ad286fca7514f37557db2f6f",
+          "message": ":pencil: Update the part of acknowledge.",
+          "timestamp": "2020-06-08T13:19:23+08:00",
+          "tree_id": "017d0e42445191c29b8bab29721e001bf07330aa",
+          "url": "https://github.com/PsiACE/loge/commit/91b670f19bd5ca83ad286fca7514f37557db2f6f"
+        },
+        "date": 1591593672313,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "b10_no_logger_active",
+            "value": 46,
+            "range": "± 8",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "b20_initialize_logger",
+            "value": 0,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "b30_relevant_logs",
+            "value": 198894,
+            "range": "± 34788",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "b40_suppressed_logs",
+            "value": 184631,
+            "range": "± 38256",
             "unit": "ns/iter"
           }
         ]
