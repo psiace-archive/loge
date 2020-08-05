@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1591593672858,
+  "lastUpdate": 1596595825633,
   "repoUrl": "https://github.com/PsiACE/loge",
   "entries": {
     "Rust Benchmark": [
@@ -191,6 +191,54 @@ window.BENCHMARK_DATA = {
             "name": "b40_suppressed_logs",
             "value": 184631,
             "range": "± 38256",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "PsiACE@Outlook.com",
+            "name": "Chojan Shang",
+            "username": "PsiACE"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "820966a022e61b748c9f12f6b2844f7356a9aadb",
+          "message": "Update check-code.yml\n\nAdd auto changelog",
+          "timestamp": "2020-08-05T10:49:16+08:00",
+          "tree_id": "409ed784fa378b14efab4e2253f53ee6e8caaa43",
+          "url": "https://github.com/PsiACE/loge/commit/820966a022e61b748c9f12f6b2844f7356a9aadb"
+        },
+        "date": 1596595825197,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "b10_no_logger_active",
+            "value": 51,
+            "range": "± 14",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "b20_initialize_logger",
+            "value": 0,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "b30_relevant_logs",
+            "value": 184139,
+            "range": "± 50625",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "b40_suppressed_logs",
+            "value": 216920,
+            "range": "± 25540",
             "unit": "ns/iter"
           }
         ]
