@@ -86,3 +86,11 @@ jobs:
           components: clippy
           override: true
     - run: cargo clippy
+  
+  changelog:
+    name: "Gen Changelog"
+    runs-on: ubuntu-latest
+    steps:
+    - uses: heinrichreimer/github-changelog-generator-action@v2.1.1
+    - with:
+         token: ${{ secrets.GITHUB_TOKEN }}
