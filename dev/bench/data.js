@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1596595825633,
+  "lastUpdate": 1596598628233,
   "repoUrl": "https://github.com/PsiACE/loge",
   "entries": {
     "Rust Benchmark": [
@@ -239,6 +239,54 @@ window.BENCHMARK_DATA = {
             "name": "b40_suppressed_logs",
             "value": 216920,
             "range": "± 25540",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "psiace@outlook.com",
+            "name": "Chojan Shang",
+            "username": "PsiACE"
+          },
+          "committer": {
+            "email": "psiace@outlook.com",
+            "name": "Chojan Shang",
+            "username": "PsiACE"
+          },
+          "distinct": true,
+          "id": "c4cc8eb19fc12e09208642a780003c82cbbad687",
+          "message": ":construction_worker: Upload changelog by CI.",
+          "timestamp": "2020-08-05T11:35:50+08:00",
+          "tree_id": "531b23181d08338db73b48648a88eefb4276422a",
+          "url": "https://github.com/PsiACE/loge/commit/c4cc8eb19fc12e09208642a780003c82cbbad687"
+        },
+        "date": 1596598627849,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "b10_no_logger_active",
+            "value": 49,
+            "range": "± 14",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "b20_initialize_logger",
+            "value": 0,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "b30_relevant_logs",
+            "value": 182775,
+            "range": "± 33885",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "b40_suppressed_logs",
+            "value": 168505,
+            "range": "± 33080",
             "unit": "ns/iter"
           }
         ]
